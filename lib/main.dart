@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../page/login_page.dart';
-import '../page/register_page.dart';
-import '../page/home_page.dart';
-import '../page/profile_page.dart';
+import 'package:mobile_labs/page/home_page.dart';
+import 'package:mobile_labs/page/login_page.dart';
+import 'package:mobile_labs/page/profile_page.dart';
+import 'package:mobile_labs/page/register_page.dart';
 
 void main() {
   runApp(const HomeSecurityApp());

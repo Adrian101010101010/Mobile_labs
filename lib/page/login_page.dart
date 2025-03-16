@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/auth_scaffold.dart';
+import 'package:mobile_labs/widgets/auth_scaffold.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
