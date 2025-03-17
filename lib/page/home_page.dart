@@ -14,13 +14,8 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(20),
+            Card(elevation: 4, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15),),
+              child: const Padding(padding: EdgeInsets.all(20),
                 child: Column(
                   children: [
                     Icon(
@@ -29,18 +24,13 @@ class HomePage extends StatelessWidget {
                       color: Colors.green,
                     ),
                     SizedBox(height: 10),
-                    Text(
-                      'The house is protected.',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
+                    Text('The house is protected.', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _controlButton(Icons.lock, 'Protection'),
                 _controlButton(Icons.videocam, 'Cameras'),
@@ -51,26 +41,10 @@ class HomePage extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
-                  _sensorTile(
-                    FontAwesomeIcons.doorClosed,
-                    'Entrance door',
-                    'Closed',
-                  ),
-                  _sensorTile(
-                    FontAwesomeIcons.windowRestore,
-                    'Windows',
-                    'Closed',
-                  ),
-                  _sensorTile(
-                    FontAwesomeIcons.fireExtinguisher,
-                    'Smoke detector',
-                    'Norm',
-                  ),
-                  _sensorTile(
-                    FontAwesomeIcons.personRunning,
-                    'Movement in the corridor',
-                    'Not recorded',
-                  ),
+                  _sensorTile(FontAwesomeIcons.doorClosed, 'Entrance door', 'Closed',),
+                  _sensorTile(FontAwesomeIcons.windowRestore, 'Windows', 'Closed',),
+                  _sensorTile(FontAwesomeIcons.fireExtinguisher, 'Smoke detector', 'Norm',),
+                  _sensorTile(FontAwesomeIcons.personRunning,'Movement in the corridor', 'Not recorded',),
                 ],
               ),
             ),
@@ -89,9 +63,7 @@ class HomePage extends StatelessWidget {
           child: Icon(icon, size: 28),
         ),
         const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -103,10 +75,7 @@ class HomePage extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         leading: Icon(icon, size: 28, color: Colors.blueGrey),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
         subtitle: Text(
           status,
           style: TextStyle(color: status == 'Norm' ? Colors.green : Colors.red),

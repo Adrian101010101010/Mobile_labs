@@ -10,9 +10,9 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blueAccent),
+            decoration: BoxDecoration(color: Colors.blueGrey),
             child: Text('Menu',
-                style: TextStyle(color: Colors.cyanAccent, fontSize: 24),),
+                style: TextStyle(color: Colors.white, fontSize: 24),),
           ),
           ListTile(
             title: const Text('Home'),
