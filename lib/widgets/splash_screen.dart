@@ -18,6 +18,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+
     String? isLoggedIn = await _storage.read(key: 'loggedIn');
 
     if (isLoggedIn == 'true') {

@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class AuthScaffold extends StatefulWidget {
+abstract class AuthScaffoldBase extends StatefulWidget {
   final String title, buttonText, linkText;
   final String? subtitle;
-  final VoidCallback onButtonPressed, onLinkPressed;
+  final VoidCallback onLinkPressed;
+  final void Function(String, String) onButtonPressed;
 
-  const AuthScaffold({
+  const AuthScaffoldBase({
+    super.key,
     required this.title,
     required this.buttonText,
     required this.onButtonPressed,
     required this.linkText,
     required this.onLinkPressed,
     this.subtitle,
-    super.key,
   });
 
   @override
-  _AuthScaffoldState createState() => _AuthScaffoldState();
+  AuthScaffoldBaseState createState();
 }
 
-class _AuthScaffoldState extends State<AuthScaffold> {
+abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
+    extends State<T> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _emailFocus = FocusNode();
-  final _passwordFocus = FocusNode();
   final _storage = const FlutterSecureStorage();
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
 
   @override
   void initState() {
@@ -34,31 +36,39 @@ class _AuthScaffoldState extends State<AuthScaffold> {
   }
 
   Future<void> _checkLoginStatus() async {
-    String? isLoggedIn = await _storage.read(key: 'loggedIn');
-    if (isLoggedIn == 'true') {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
+    String? email = await _storage.read(key: 'email');
+    String? password = await _storage.read(key: 'password');
+
+    if (email != null && password != null && mounted) {
+      widget.onButtonPressed(email, password);
     }
   }
 
-  Future<void> _saveCredentials() async {
-    if (_emailController.text == '1111' && _passwordController.text == '8888') {
-      await _storage.write(key: 'loggedIn', value: 'true');
-      widget.onButtonPressed();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password!')),
-      );
-    }
+  void _validateInputs() {
+    setState(() {
+      _isEmailValid = _emailController.text.endsWith('@gmail.com');
+      _isPasswordValid = _passwordController.text.length >= 8;
+    });
+  }
+
+  void _handleButtonPress() {
+    widget.onButtonPressed(_emailController.text, _passwordController.text);
+    _clearInputs();
+  }
+
+  void _clearInputs() {
+    _emailController.clear();
+    _passwordController.clear();
+    setState(() {
+      _isEmailValid = false;
+      _isPasswordValid = false;
+    });
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
     super.dispose();
   }
 
@@ -76,34 +86,75 @@ class _AuthScaffoldState extends State<AuthScaffold> {
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Text(
                   widget.subtitle!,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
             TextField(
               controller: _emailController,
-              focusNode: _emailFocus,
-              decoration: const InputDecoration(labelText: 'Email'),
-              textInputAction: TextInputAction.next,
-              onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocus),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                errorText:
+                    _emailController.text.isNotEmpty && !_isEmailValid
+                        ? 'Email має закінчуватись на @gmail.com'
+                        : null,
+              ),
+              onChanged: (value) => _validateInputs(),
             ),
             TextField(
               controller: _passwordController,
-              focusNode: _passwordFocus,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                errorText:
+                    _passwordController.text.isNotEmpty && !_isPasswordValid
+                        ? 'Пароль має містити мінімум 8 символів'
+                        : null,
+              ),
               obscureText: true,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) async => await _saveCredentials(),
+              onChanged: (value) => _validateInputs(),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _saveCredentials,
+              onPressed:
+                  (_isEmailValid && _isPasswordValid)
+                      ? _handleButtonPress
+                      : null,
               child: Text(widget.buttonText),
             ),
-            TextButton(onPressed: widget.onLinkPressed, child: Text(widget.linkText)),
+            TextButton(
+              onPressed: widget.onLinkPressed,
+              child: Text(widget.linkText),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+class AuthScaffold extends AuthScaffoldBase {
+  const AuthScaffold({
+    super.key,
+    required String title,
+    required String buttonText,
+    required void Function(String, String) onButtonPressed,
+    required String linkText,
+    required VoidCallback onLinkPressed,
+    String? subtitle,
+  }) : super(
+         title: title,
+         buttonText: buttonText,
+         onButtonPressed: onButtonPressed,
+         linkText: linkText,
+         onLinkPressed: onLinkPressed,
+         subtitle: subtitle,
+       );
+
+  @override
+  AuthScaffoldBaseState<AuthScaffold> createState() => _AuthScaffoldState();
+}
+
+class _AuthScaffoldState extends AuthScaffoldBaseState<AuthScaffold> {}

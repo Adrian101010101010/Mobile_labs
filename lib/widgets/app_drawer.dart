@@ -30,9 +30,9 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Logout'),
             onTap: () async {
-              await storage.delete(key: 'loggedIn');
+              await storage.write(key: 'loggedIn', value: 'false');
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/', (route) => false);
+                  context, '/login', (route) => false);
             },
           ),
         ],
