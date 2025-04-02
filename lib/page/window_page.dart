@@ -5,13 +5,17 @@ class WindowPage extends StatefulWidget {
   final bool isWindowOpen;
   final void Function(bool) onWindowStateChanged;
 
-  const WindowPage({super.key, required this.isWindowOpen, required this.onWindowStateChanged});
+  const WindowPage({
+    required this.isWindowOpen,
+    required this.onWindowStateChanged,
+    super.key,
+  });
 
   @override
-  _WindowPageState createState() => _WindowPageState();
+  WindowPageState createState() => WindowPageState();
 }
 
-class _WindowPageState extends State<WindowPage> {
+class WindowPageState extends State<WindowPage> {
   late bool _isWindowOpen;
 
   @override
@@ -36,7 +40,9 @@ class _WindowPageState extends State<WindowPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _isWindowOpen ? FontAwesomeIcons.windowMaximize : FontAwesomeIcons.windowRestore,
+              _isWindowOpen
+                  ? FontAwesomeIcons.windowMaximize
+                  : FontAwesomeIcons.windowRestore,
               size: 100,
               color: _isWindowOpen ? Colors.green : Colors.red,
             ),

@@ -6,12 +6,12 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  ProfilePageState createState() => ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class ProfilePageState extends State<ProfilePage> {
   final _storage = const FlutterSecureStorage();
-  String _email = "Loading...";
+  String _email = 'Loading...';
 
   @override
   void initState() {
@@ -20,53 +20,57 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    String? email = await _storage.read(key: 'email');
-
+    final String? email = await _storage.read(key: 'email');
+    if (!mounted) return;
     setState(() {
-      _email = email ?? "No email found";
+      _email = email ?? 'No email found';
     });
   }
 
   Future<void> _editEmail() async {
-    TextEditingController controller = TextEditingController(text: _email);
+    final TextEditingController controller = TextEditingController(
+      text: _email,
+    );
 
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Edit Email"),
+        title: const Text('Edit Email'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: "New Email"),
+          decoration: const InputDecoration(labelText: 'New Email'),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            onPressed: () => Navigator.pop(context), // Close dialog
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              String newEmail = controller.text.trim();
-              if (newEmail.isNotEmpty && newEmail.contains("@")) {
+              final String newEmail = controller.text.trim();
+              if (newEmail.isNotEmpty && newEmail.contains('@')) {
                 await _storage.write(key: 'email', value: newEmail);
+
+                if (!mounted) return;
                 setState(() {
                   _email = newEmail;
                 });
-                Navigator.pop(context);
               }
             },
-            child: const Text("Save"),
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -78,13 +82,18 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: ListTile(
                 leading: const Icon(Icons.email, color: Colors.blueGrey),
                 title: Text(
                   _email,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.blueGrey),

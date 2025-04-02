@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class AuthScaffoldBase extends StatefulWidget {
-  final String title, buttonText, linkText;
-  final String? subtitle;
+  final String title;
+  final String buttonText;
+  final String linkText;
   final VoidCallback onLinkPressed;
   final void Function(String, String) onButtonPressed;
+  final String? subtitle;
 
   const AuthScaffoldBase({
-    super.key,
     required this.title,
     required this.buttonText,
     required this.onButtonPressed,
     required this.linkText,
     required this.onLinkPressed,
+    super.key,
     this.subtitle,
   });
 
@@ -23,9 +25,9 @@ abstract class AuthScaffoldBase extends StatefulWidget {
 
 abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
     extends State<T> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _storage = const FlutterSecureStorage();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   bool _isEmailValid = false;
   bool _isPasswordValid = false;
 
@@ -36,8 +38,8 @@ abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
   }
 
   Future<void> _checkLoginStatus() async {
-    String? email = await _storage.read(key: 'email');
-    String? password = await _storage.read(key: 'password');
+    final String? email = await _storage.read(key: 'email');
+    final String? password = await _storage.read(key: 'password');
 
     if (email != null && password != null && mounted) {
       widget.onButtonPressed(email, password);
@@ -98,9 +100,9 @@ abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
               decoration: InputDecoration(
                 labelText: 'Email',
                 errorText:
-                    _emailController.text.isNotEmpty && !_isEmailValid
-                        ? 'Email має закінчуватись на @gmail.com'
-                        : null,
+                _emailController.text.isNotEmpty && !_isEmailValid
+                    ? 'Email має закінчуватись на @gmail.com'
+                    : null,
               ),
               onChanged: (value) => _validateInputs(),
             ),
@@ -109,9 +111,9 @@ abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
               decoration: InputDecoration(
                 labelText: 'Password',
                 errorText:
-                    _passwordController.text.isNotEmpty && !_isPasswordValid
-                        ? 'Пароль має містити мінімум 8 символів'
-                        : null,
+                _passwordController.text.isNotEmpty && !_isPasswordValid
+                    ? 'Пароль має містити мінімум 8 символів'
+                    : null,
               ),
               obscureText: true,
               onChanged: (value) => _validateInputs(),
@@ -119,9 +121,9 @@ abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed:
-                  (_isEmailValid && _isPasswordValid)
-                      ? _handleButtonPress
-                      : null,
+              (_isEmailValid && _isPasswordValid)
+                  ? _handleButtonPress
+                  : null,
               child: Text(widget.buttonText),
             ),
             TextButton(
@@ -137,21 +139,14 @@ abstract class AuthScaffoldBaseState<T extends AuthScaffoldBase>
 
 class AuthScaffold extends AuthScaffoldBase {
   const AuthScaffold({
+    required super.title,
+    required super.buttonText,
+    required super.onButtonPressed,
+    required super.linkText,
+    required super.onLinkPressed,
     super.key,
-    required String title,
-    required String buttonText,
-    required void Function(String, String) onButtonPressed,
-    required String linkText,
-    required VoidCallback onLinkPressed,
-    String? subtitle,
-  }) : super(
-         title: title,
-         buttonText: buttonText,
-         onButtonPressed: onButtonPressed,
-         linkText: linkText,
-         onLinkPressed: onLinkPressed,
-         subtitle: subtitle,
-       );
+    super.subtitle,
+  });
 
   @override
   AuthScaffoldBaseState<AuthScaffold> createState() => _AuthScaffoldState();

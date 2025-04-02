@@ -6,7 +6,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final storage = const FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
 
     return Drawer(
       child: ListView(
@@ -14,9 +14,12 @@ class AppDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Colors.blueGrey),
-            child: Text('Menu',
-                style: TextStyle(
-                    color: Colors.white, fontSize: 24)
+            child: Text(
+              'Menu',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
             ),
           ),
           ListTile(
@@ -31,8 +34,12 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () async {
               await storage.write(key: 'loggedIn', value: 'false');
+              if (!context.mounted) return;
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/login', (route) => false);
+                context,
+                '/login',
+                    (route) => false,
+              );
             },
           ),
         ],

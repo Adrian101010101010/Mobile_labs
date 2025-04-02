@@ -2,21 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class DoorPage extends StatefulWidget {
+  const DoorPage({
+    required this.isDoorOpen,
+    required this.onDoorStateChanged,
+    super.key,
+  });
+
   final bool isDoorOpen;
   final void Function(bool) onDoorStateChanged;
 
-  const DoorPage({
-    super.key,
-    required this.isDoorOpen,
-    required this.onDoorStateChanged,
-  });
-
-
   @override
-  _DoorPageState createState() => _DoorPageState();
+  DoorPageState createState() => DoorPageState();
 }
 
-class _DoorPageState extends State<DoorPage> {
+class DoorPageState extends State<DoorPage> {
   late bool _isDoorOpen;
 
   @override

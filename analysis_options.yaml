@@ -19,7 +19,6 @@ analyzer:
     dead_code: error
     unused_import: error
     unused_element: ignore
-    hint: ignore
 
 linter:
   rules:

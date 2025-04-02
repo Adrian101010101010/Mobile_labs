@@ -5,10 +5,10 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class SplashScreenState extends State<SplashScreen> {
   final _storage = const FlutterSecureStorage();
 
   @override
@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     await Future<void>.delayed(const Duration(seconds: 2));
 
-    String? isLoggedIn = await _storage.read(key: 'loggedIn');
+    final String? isLoggedIn = await _storage.read(key: 'loggedIn');
 
     if (isLoggedIn == 'true') {
       if (mounted) {

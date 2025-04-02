@@ -5,13 +5,17 @@ class SmokeDetectorPage extends StatefulWidget {
   final bool isSmokeDetected;
   final void Function(bool) onSmokeDetectedChanged;
 
-  const SmokeDetectorPage({super.key, required this.isSmokeDetected, required this.onSmokeDetectedChanged});
+  const SmokeDetectorPage({
+    required this.isSmokeDetected,
+    required this.onSmokeDetectedChanged,
+    super.key,
+  });
 
   @override
-  _SmokeDetectorPageState createState() => _SmokeDetectorPageState();
+  SmokeDetectorPageState createState() => SmokeDetectorPageState();
 }
 
-class _SmokeDetectorPageState extends State<SmokeDetectorPage> {
+class SmokeDetectorPageState extends State<SmokeDetectorPage> {
   late bool _isSmokeDetected;
 
   @override
@@ -36,7 +40,9 @@ class _SmokeDetectorPageState extends State<SmokeDetectorPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _isSmokeDetected ? FontAwesomeIcons.fireExtinguisher : FontAwesomeIcons.smoking,
+              _isSmokeDetected
+                  ? FontAwesomeIcons.fireExtinguisher
+                  : FontAwesomeIcons.smoking,
               size: 100,
               color: _isSmokeDetected ? Colors.red : Colors.green,
             ),

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class MovementPage extends StatefulWidget {
+  const MovementPage({
+    required this.isMovementDetected,
+    required this.onMovementDetectedChanged,
+    super.key,
+  });
+
   final bool isMovementDetected;
   final void Function(bool) onMovementDetectedChanged;
 
-  const MovementPage({
-    super.key,
-    required this.isMovementDetected,
-    required this.onMovementDetectedChanged
-  });
-
   @override
-  _MovementPageState createState() => _MovementPageState();
+  State<MovementPage> createState() => _MovementPageState();
 }
 
 class _MovementPageState extends State<MovementPage> {
@@ -41,14 +40,18 @@ class _MovementPageState extends State<MovementPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              _isMovementDetected ? FontAwesomeIcons.walking : FontAwesomeIcons.timesCircle,
+              _isMovementDetected
+                  ? FontAwesomeIcons.personWalking
+                  : FontAwesomeIcons.circleXmark,
               size: 100,
               color: _isMovementDetected ? Colors.red : Colors.green,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _toggleMovement,
-              child: Text(_isMovementDetected ? 'Stop Movement' : 'Detect Movement'),
+              child: Text(
+                _isMovementDetected ? 'Stop Movement' : 'Detect Movement',
+              ),
             ),
           ],
         ),

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobile_labs/widgets/app_drawer.dart';
-import 'package:mobile_labs/page/movement_page.dart';
 import 'package:mobile_labs/page/cameras_page.dart';
+import 'package:mobile_labs/page/door_page.dart';
+import 'package:mobile_labs/page/movement_page.dart';
+import 'package:mobile_labs/page/signal_page.dart';
 import 'package:mobile_labs/page/smoke_detector_page.dart';
 import 'package:mobile_labs/page/window_page.dart';
-import 'package:mobile_labs/page/door_page.dart';
-import 'package:mobile_labs/page/signal_page.dart';
+import 'package:mobile_labs/widgets/app_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   bool _isProtected = false;
-  List<String> _eventLog = [];
+  final List<String> _eventLog = [];
 
   bool _isDoorOpen = false;
   bool _isWindowOpen = false;
@@ -29,97 +29,40 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text("Security Control"),
+            title: const Text('Security Control'),
             content: Text(
               _isProtected
-                  ? "Disable security system?"
-                  : "Enable security system?",
+                  ? 'Disable security system?'
+                  : 'Enable security system?',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
+                child: const Text('Cancel'),
               ),
               TextButton(
                 onPressed: () {
                   setState(() {
                     _isProtected = !_isProtected;
                     _eventLog.add(
-                      "${DateTime.now()} - ${_isProtected ? 'Enabled' : 'Disabled'}",
+                      '${
+                          DateTime.now()
+                      } - ${_isProtected ? 'Enabled' : 'Disabled'}',
                     );
                   });
                   Navigator.pop(context);
                 },
-                child: Text(_isProtected ? "Disable" : "Enable"),
+                child: Text(_isProtected ? 'Disable' : 'Enable'),
               ),
             ],
           ),
     );
   }
 
-  void _openCamerasPage() {
+  void _openPage(Widget page) {
     Navigator.push<void>(
       context,
-      MaterialPageRoute(builder: (context) => const CamerasPage()),
-    );
-  }
-
-  void _openSignalPage() {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute(builder: (context) => SignalPage(eventLog: _eventLog)),
-    );
-  }
-
-  void _openDoorPage() {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => DoorPage(
-              isDoorOpen: _isDoorOpen,
-              onDoorStateChanged: _onDoorStateChanged,
-            ),
-      ),
-    );
-  }
-
-  void _openWindowPage() {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => WindowPage(
-              isWindowOpen: _isWindowOpen,
-              onWindowStateChanged: _onWindowStateChanged,
-            ),
-      ),
-    );
-  }
-
-  void _openSmokeDetectorPage() {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => SmokeDetectorPage(
-              isSmokeDetected: _isSmokeDetected,
-              onSmokeDetectedChanged: _onSmokeDetectedChanged,
-            ),
-      ),
-    );
-  }
-
-  void _openMovementPage() {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => MovementPage(
-              isMovementDetected: _isMovementDetected,
-              onMovementDetectedChanged: _onMovementDetectedChanged,
-            ),
-      ),
+      MaterialPageRoute(builder: (context) => page),
     );
   }
 
@@ -128,7 +71,7 @@ class _HomePageState extends State<HomePage> {
       _isDoorOpen = isOpen;
     });
     if (_isProtected && isOpen) {
-      _eventLog.add("${DateTime.now()} - Door opened (Security breach!)");
+      _eventLog.add('${DateTime.now()} - Door opened (Security breach!)');
     }
   }
 
@@ -137,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       _isWindowOpen = isOpen;
     });
     if (_isProtected && isOpen) {
-      _eventLog.add("${DateTime.now()} - Window opened (Security breach!)");
+      _eventLog.add('${DateTime.now()} - Window opened (Security breach!)');
     }
   }
 
@@ -146,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       _isSmokeDetected = isDetected;
     });
     if (_isProtected && isDetected) {
-      _eventLog.add("${DateTime.now()} - Smoke detected (Security breach!)");
+      _eventLog.add('${DateTime.now()} - Smoke detected (Security breach!)');
     }
   }
 
@@ -155,7 +98,7 @@ class _HomePageState extends State<HomePage> {
       _isMovementDetected = isDetected;
     });
     if (_isProtected && isDetected) {
-      _eventLog.add("${DateTime.now()} - Movement detected (Security breach!)");
+      _eventLog.add('${DateTime.now()} - Movement detected (Security breach!)');
     }
   }
 
@@ -201,8 +144,16 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _controlButton(Icons.lock, 'Protection', _toggleProtection),
-                _controlButton(Icons.videocam, 'Cameras', _openCamerasPage),
-                _controlButton(Icons.notifications, 'Signal', _openSignalPage),
+                _controlButton(
+                  Icons.videocam,
+                  'Cameras',
+                  () => _openPage(const CamerasPage()),
+                ),
+                _controlButton(
+                  Icons.notifications,
+                  'Signal',
+                  () => _openPage(SignalPage(eventLog: _eventLog)),
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -213,25 +164,45 @@ class _HomePageState extends State<HomePage> {
                     FontAwesomeIcons.doorClosed,
                     'Entrance door',
                     _isDoorOpen,
-                    _openDoorPage,
+                    () => _openPage(
+                      DoorPage(
+                        isDoorOpen: _isDoorOpen,
+                        onDoorStateChanged: _onDoorStateChanged,
+                      ),
+                    ),
                   ),
                   _sensorTile(
                     FontAwesomeIcons.windowRestore,
                     'Windows',
                     _isWindowOpen,
-                    _openWindowPage,
+                    () => _openPage(
+                      WindowPage(
+                        isWindowOpen: _isWindowOpen,
+                        onWindowStateChanged: _onWindowStateChanged,
+                      ),
+                    ),
                   ),
                   _sensorTile(
                     FontAwesomeIcons.fireExtinguisher,
                     'Smoke detector',
                     _isSmokeDetected,
-                    _openSmokeDetectorPage,
+                    () => _openPage(
+                      SmokeDetectorPage(
+                        isSmokeDetected: _isSmokeDetected,
+                        onSmokeDetectedChanged: _onSmokeDetectedChanged,
+                      ),
+                    ),
                   ),
                   _sensorTile(
                     FontAwesomeIcons.personRunning,
                     'Movement in the corridor',
                     _isMovementDetected,
-                    _openMovementPage,
+                    () => _openPage(
+                      MovementPage(
+                        isMovementDetected: _isMovementDetected,
+                        onMovementDetectedChanged: _onMovementDetectedChanged,
+                      ),
+                    ),
                   ),
                 ],
               ),
