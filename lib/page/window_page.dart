@@ -1,59 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mobile_labs/abstract_class/toggleable_page.dart';
 
-class WindowPage extends StatefulWidget {
-  final bool isWindowOpen;
-  final void Function(bool) onWindowStateChanged;
-
+class WindowPage extends ToggleablePage {
   const WindowPage({
-    required this.isWindowOpen,
-    required this.onWindowStateChanged,
+    required super.initialState,
+    required super.onStateChanged,
     super.key,
   });
 
   @override
-  WindowPageState createState() => WindowPageState();
+  ToggleablePageState createState() => _WindowPageState();
 }
 
-class WindowPageState extends State<WindowPage> {
-  late bool _isWindowOpen;
+class _WindowPageState extends ToggleablePageState<WindowPage> {
+  @override
+  String getTitle() => 'Windows';
 
   @override
-  void initState() {
-    super.initState();
-    _isWindowOpen = widget.isWindowOpen;
-  }
-
-  void _toggleWindow() {
-    setState(() {
-      _isWindowOpen = !_isWindowOpen;
-    });
-    widget.onWindowStateChanged(_isWindowOpen);
-  }
+  IconData getIcon(bool isActive) =>
+      isActive
+          ? FontAwesomeIcons.windowMaximize
+          : FontAwesomeIcons.windowRestore;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Windows')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              _isWindowOpen
-                  ? FontAwesomeIcons.windowMaximize
-                  : FontAwesomeIcons.windowRestore,
-              size: 100,
-              color: _isWindowOpen ? Colors.green : Colors.red,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _toggleWindow,
-              child: Text(_isWindowOpen ? 'Close Window' : 'Open Window'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Color getColor(bool isActive) => isActive ? Colors.green : Colors.red;
+
+  @override
+  String getButtonText(bool isActive) =>
+      isActive ? 'Close Window' : 'Open Window';
 }

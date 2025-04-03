@@ -34,6 +34,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () async {
               await storage.write(key: 'loggedIn', value: 'false');
+              await storage.delete(key: 'email');
               if (!context.mounted) return;
               Navigator.pushNamedAndRemoveUntil(
                 context,

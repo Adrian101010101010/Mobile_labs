@@ -1,59 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mobile_labs/abstract_class/toggleable_page.dart';
 
-class SmokeDetectorPage extends StatefulWidget {
-  final bool isSmokeDetected;
-  final void Function(bool) onSmokeDetectedChanged;
-
+class SmokeDetectorPage extends ToggleablePage {
   const SmokeDetectorPage({
-    required this.isSmokeDetected,
-    required this.onSmokeDetectedChanged,
+    required super.initialState,
+    required super.onStateChanged,
     super.key,
   });
 
   @override
-  SmokeDetectorPageState createState() => SmokeDetectorPageState();
+  ToggleablePageState createState() => _SmokeDetectorPageState();
 }
 
-class SmokeDetectorPageState extends State<SmokeDetectorPage> {
-  late bool _isSmokeDetected;
+class _SmokeDetectorPageState extends ToggleablePageState<SmokeDetectorPage> {
+  @override
+  String getTitle() => 'Smoke Detector';
 
   @override
-  void initState() {
-    super.initState();
-    _isSmokeDetected = widget.isSmokeDetected;
-  }
-
-  void _toggleSmoke() {
-    setState(() {
-      _isSmokeDetected = !_isSmokeDetected;
-    });
-    widget.onSmokeDetectedChanged(_isSmokeDetected);
-  }
+  IconData getIcon(bool isActive) =>
+      isActive ? FontAwesomeIcons.fireExtinguisher : FontAwesomeIcons.smoking;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Smoke Detector')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              _isSmokeDetected
-                  ? FontAwesomeIcons.fireExtinguisher
-                  : FontAwesomeIcons.smoking,
-              size: 100,
-              color: _isSmokeDetected ? Colors.red : Colors.green,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _toggleSmoke,
-              child: Text(_isSmokeDetected ? 'Clear Smoke' : 'Detect Smoke'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Color getColor(bool isActive) => isActive ? Colors.red : Colors.green;
+
+  @override
+  String getButtonText(bool isActive) =>
+      isActive ? 'Clear Smoke' : 'Detect Smoke';
 }
