@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_labs/abstract_class/auth_logic_base.dart';
+import 'package:mobile_labs/shared/auth_logic_base.dart';
 
 abstract class AuthScaffoldBase extends StatefulWidget {
   final String title;

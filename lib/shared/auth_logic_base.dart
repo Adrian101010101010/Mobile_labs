@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_labs/services/auth_storage.dart';
 
 abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
+  final AuthStorage authStorage = AuthStorage();
 
   bool isEmailValid = false;
   bool isPasswordValid = false;
@@ -16,11 +16,9 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   }
 
   Future<void> _checkLoginStatus() async {
-    final String? email = await storage.read(key: 'email');
-    final String? password = await storage.read(key: 'password');
-
-    if (email != null && password != null && mounted) {
-      onLogin(email, password);
+    await authStorage.loadCredentials();
+    if (authStorage.email != null && authStorage.password != null && mounted) {
+      onLogin(authStorage.email!, authStorage.password!);
     }
   }
 
@@ -32,6 +30,7 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   }
 
   void handleLogin() {
+    authStorage.saveCredentials(emailController.text, passwordController.text);
     onLogin(emailController.text, passwordController.text);
     clearInputs();
   }

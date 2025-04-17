@@ -1,4 +1,4 @@
-import 'package:mobile_labs/abstract_class/auth_scaffold_base.dart';
+import 'package:mobile_labs/shared/auth_scaffold_base.dart';
 
 class AuthScaffold extends AuthScaffoldBase {
   const AuthScaffold({
