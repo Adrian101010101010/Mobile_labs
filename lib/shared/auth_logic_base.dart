@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_labs/services/auth_storage.dart';
 
@@ -9,15 +11,67 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   bool isEmailValid = false;
   bool isPasswordValid = false;
 
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      result,
+    ) {
+      final hasConnection = result != ConnectivityResult.none;
+
+      if (!hasConnection) {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Connection lost. You are offline.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          });
+        }
+      } else {
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Connection restored.'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          });
+        }
+      }
+    });
   }
 
   Future<void> _checkLoginStatus() async {
     await authStorage.loadCredentials();
-    if (authStorage.email != null && authStorage.password != null && mounted) {
+
+    final isLoggedIn = await authStorage.isLoggedIn();
+    final connectivityResult = await Connectivity().checkConnectivity();
+    final hasConnection = connectivityResult != ConnectivityResult.none;
+
+    if (isLoggedIn &&
+        authStorage.email != null &&
+        authStorage.password != null &&
+        mounted) {
+      if (!hasConnection) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'You are offline. Some features may be unavailable.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        });
+      }
+
       onLogin(authStorage.email!, authStorage.password!);
     }
   }
@@ -29,8 +83,28 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
     });
   }
 
-  void handleLogin() {
-    authStorage.saveCredentials(emailController.text, passwordController.text);
+  void handleLogin() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    final hasConnection = connectivityResult != ConnectivityResult.none;
+
+    if (!hasConnection) {
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No internet connection'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
+      }
+      return;
+    }
+
+    await authStorage.saveCredentials(
+      emailController.text,
+      passwordController.text,
+    );
     onLogin(emailController.text, passwordController.text);
     clearInputs();
   }
@@ -48,6 +122,7 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
 
   @override
   void dispose() {
+    _connectivitySubscription?.cancel();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
