@@ -29,6 +29,7 @@ class AuthStorage extends ChangeNotifier implements AuthService {
     _password = password;
     await _storage.write(key: 'email', value: email);
     await _storage.write(key: 'password', value: password);
+    await _storage.write(key: 'loggedIn', value: 'true');
     notifyListeners();
   }
 
@@ -45,6 +46,13 @@ class AuthStorage extends ChangeNotifier implements AuthService {
     _password = null;
     await _storage.delete(key: 'email');
     await _storage.delete(key: 'password');
+    await _storage.delete(key: 'loggedIn');
     notifyListeners();
   }
+
+  Future<bool> isLoggedIn() async {
+    final value = await _storage.read(key: 'loggedIn');
+    return value == 'true';
+  }
+
 }

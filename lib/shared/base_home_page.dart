@@ -146,9 +146,9 @@ abstract class BaseHomePageState<T extends BaseHomePage> extends State<T> {
       children: [
         _controlButton(Icons.lock, 'Protection', toggleProtection),
         _controlButton(
-          Icons.videocam,
-          'Cameras',
-          () => openPage(const CamerasPage()),
+          Icons.thermostat,
+          'Temperature',
+          () => openPage(const HomeTemperaturePage()),
         ),
         _controlButton(
           Icons.notifications,
