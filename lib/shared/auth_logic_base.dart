@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_labs/services/auth_storage.dart';
+import 'package:mobile_labs/services/connectivity_notifier.dart';
 
 abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   final TextEditingController emailController = TextEditingController();
@@ -11,49 +11,42 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   bool isEmailValid = false;
   bool isPasswordValid = false;
 
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  late final ConnectivityNotifier _connectivityNotifier;
+  StreamSubscription<bool>? _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
-      result,
-    ) {
-      final hasConnection = result != ConnectivityResult.none;
 
-      if (!hasConnection) {
-        if (mounted) {
+    _connectivityNotifier = ConnectivityNotifier();
+
+    _connectivitySubscription =
+        _connectivityNotifier.onStatusChange.listen((isConnected) {
+          if (!mounted) return;
+
+          final message = isConnected
+              ? 'Connection restored.'
+              : 'Connection lost. You are offline.';
+          final color = isConnected ? Colors.green : Colors.red;
+
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Connection lost. You are offline.'),
-                backgroundColor: Colors.red,
+              SnackBar(
+                content: Text(message),
+                backgroundColor: color,
               ),
             );
           });
-        }
-      } else {
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Connection restored.'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          });
-        }
-      }
-    });
+        });
+
+    _checkLoginStatus();
   }
 
   Future<void> _checkLoginStatus() async {
     await authStorage.loadCredentials();
 
     final isLoggedIn = await authStorage.isLoggedIn();
-    final connectivityResult = await Connectivity().checkConnectivity();
-    final hasConnection = connectivityResult != ConnectivityResult.none;
+    final hasConnection = await _connectivityNotifier.getInitialStatus();
 
     if (isLoggedIn &&
         authStorage.email != null &&
@@ -84,8 +77,7 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   }
 
   void handleLogin() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    final hasConnection = connectivityResult != ConnectivityResult.none;
+    final hasConnection = await _connectivityNotifier.getInitialStatus();
 
     if (!hasConnection) {
       if (mounted) {
@@ -123,6 +115,7 @@ abstract class AuthLogicBase<T extends StatefulWidget> extends State<T> {
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    _connectivityNotifier.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
