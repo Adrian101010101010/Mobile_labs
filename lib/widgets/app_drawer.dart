@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_labs/page/setup_device_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -29,6 +30,18 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Profile'),
             onTap: () => Navigator.pushNamed(context, '/profile'),
+          ),
+          ListTile(
+            title: const Text('Налаштування пристрою'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                    builder: (_) => const SetupDevicePage(),
+                ),
+              );
+            },
           ),
           ListTile(
             title: const Text('Logout'),
