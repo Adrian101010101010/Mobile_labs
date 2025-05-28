@@ -10,6 +10,8 @@ class DeviceStatusCubit extends Cubit<List<String>> {
   final String topic;
   late final MqttServerClient _client;
   final List<String> _messages = [];
+  final int _maxMessages = 100;
+  Timer? _cleanupTimer;
 
   DeviceStatusCubit({required this.topic}) : super([]) {
     _connectAndSubscribe();
@@ -49,8 +51,17 @@ class DeviceStatusCubit extends Cubit<List<String>> {
           recMessage.payload.message,
         );
         _messages.add(message);
+        if (_messages.length > _maxMessages) {
+          _messages.removeAt(0);
+        }
         emit(List.from(_messages));
       });
+
+      _cleanupTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
+        _messages.clear();
+        emit([]);
+      });
+
     } catch (e) {
       debugPrint('MQTT помилка підключення: $e');
       _client.disconnect();
@@ -63,6 +74,7 @@ class DeviceStatusCubit extends Cubit<List<String>> {
 
   @override
   Future<void> close() {
+    _cleanupTimer?.cancel();
     disconnect();
     return super.close();
   }

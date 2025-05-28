@@ -26,11 +26,23 @@ class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit(this._storage) : super(const RegisterState());
 
   Future<void> register(String email, String password) async {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
     if (email.isEmpty || password.isEmpty) {
       emit(
         state.copyWith(
           status: RegisterStatus.failure,
           errorMessage: 'Email and password cannot be empty',
+        ),
+      );
+      return;
+    }
+
+    if (!emailRegex.hasMatch(email)) {
+      emit(
+        state.copyWith(
+          status: RegisterStatus.failure,
+          errorMessage: 'Invalid email format',
         ),
       );
       return;

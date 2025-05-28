@@ -24,29 +24,30 @@ class ProfileView extends StatelessWidget {
 
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Email'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(labelText: 'New Email'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Edit Email'),
+            content: TextField(
+              controller: controller,
+              decoration: const InputDecoration(labelText: 'New Email'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final newEmail = controller.text.trim();
+                  if (newEmail.isNotEmpty && newEmail.contains('@')) {
+                    context.read<ProfileCubit>().updateEmail(newEmail);
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              final newEmail = controller.text.trim();
-              if (newEmail.isNotEmpty && newEmail.contains('@')) {
-                context.read<ProfileCubit>().updateEmail(newEmail);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -59,39 +60,61 @@ class ProfileView extends StatelessWidget {
           drawer: const AppDrawer(),
           body: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.blueGrey,
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
-                ),
-                const SizedBox(height: 20),
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 10, horizontal: 20,),
-                  child: ListTile(
-                    leading:
-                    const Icon(Icons.email, color: Colors.blueGrey),
-                    title: Text(
-                      state.email,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
+            child: Center(
+              child: switch (state) {
+                ProfileLoading() => const CircularProgressIndicator(),
+                ProfileError(:final message) =>
+                    Text(
+                      'Error: $message',
+                      style: const TextStyle(color: Colors.red),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blueGrey),
-                      onPressed: () => _editEmail(context, state.email),
+                ProfileLoaded(:final email) =>
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.blueGrey,
+                          child: Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.email,
+                              color: Colors.blueGrey,
+                            ),
+                            title: Text(
+                              email,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.blueGrey,
+                              ),
+                              onPressed: () => _editEmail(context, email),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
+              },
             ),
           ),
         );
