@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobile_labs/services/mqtt_service.dart';
 
 class TemperatureCubit extends Cubit<String?> {
@@ -7,10 +8,10 @@ class TemperatureCubit extends Cubit<String?> {
   TemperatureCubit()
       : super(null) {
     _mqttService = MQTTService(
-      broker: '76c4961e76394de3ad025d878ef7973d.s1.eu.hivemq.cloud',
+      broker: dotenv.env['MQTT_BROKER']!,
       topic: 'sensor/temperature',
-      username: 'Users',
-      password: 'Lb1234567890',
+      username: dotenv.env['MQTT_USERNAME']!,
+      password: dotenv.env['MQTT_PASSWORD']!,
       onMessageReceived: emit,
     );
 

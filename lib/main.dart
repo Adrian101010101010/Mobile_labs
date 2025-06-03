@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobile_labs/page/home_page.dart';
 import 'package:mobile_labs/page/login_page.dart';
 import 'package:mobile_labs/page/profile_page.dart';
 import 'package:mobile_labs/page/register_page.dart';
 import 'package:mobile_labs/widgets/splash_screen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load();
   runApp(const HomeSecurityApp());
 }
 
