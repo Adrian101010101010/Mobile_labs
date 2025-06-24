@@ -1,49 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_labs/cubit/login_cubit.dart';
 import 'package:mobile_labs/widgets/auth_scaffold.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
 
-  Future<void> _loginUser(
-    BuildContext context,
-    String email,
-    String password,
-  ) async {
-    if (email.isEmpty || password.isEmpty) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password')),
-      );
-      return;
-    }
+class _LoginPageState extends State<LoginPage> {
+  late final LoginCubit _loginCubit;
 
-    final String? savedEmail = await _storage.read(key: 'email');
-    final String? savedPassword = await _storage.read(key: 'password');
+  @override
+  void initState() {
+    super.initState();
+    _loginCubit = LoginCubit(const FlutterSecureStorage());
+  }
 
-    if (email == savedEmail && password == savedPassword) {
-      if (!context.mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
-    }
+  @override
+  void dispose() {
+    _loginCubit.close();
+    super.dispose();
+  }
+
+  void _onButtonPressed(String email, String password) {
+    _loginCubit.login(email, password);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AuthScaffold(
-      title: 'Login',
-      buttonText: 'Sign In',
-      onButtonPressed: (email, password) {
-        _loginUser(context, email, password);
-      },
-      linkText: "Don't have an account? Register",
-      onLinkPressed: () => Navigator.pushNamed(context, '/register'),
+    return BlocProvider<LoginCubit>.value(
+      value: _loginCubit,
+      child: BlocListener<LoginCubit, LoginState>(
+        listener: (context, state) {
+          if (state.status == LoginStatus.failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage ?? 'Login failed')),
+            );
+          } else if (state.status == LoginStatus.success) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        },
+        child: BlocBuilder<LoginCubit, LoginState>(
+          builder: (context, state) {
+            return AuthScaffold(
+              title: 'Login',
+              buttonText: state.status == LoginStatus.loading
+                  ? 'Signing In...'
+                  : 'Sign In',
+              onButtonPressed: state.status == LoginStatus.loading
+                  ? (_, __) {}
+                  : _onButtonPressed,
+              linkText: "Don't have an account? Register",
+              onLinkPressed: () => Navigator.pushNamed(context, '/register'),
+            );
+          },
+        ),
+      ),
     );
   }
 }

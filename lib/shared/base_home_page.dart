@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mobile_labs/page/cameras_page.dart';
+
+import 'package:mobile_labs/cubit/signal_cubit.dart';
 import 'package:mobile_labs/page/door_page.dart';
+import 'package:mobile_labs/page/home_temperature_page.dart';
 import 'package:mobile_labs/page/movement_page.dart';
 import 'package:mobile_labs/page/signal_page.dart';
 import 'package:mobile_labs/page/smoke_detector_page.dart';
 import 'package:mobile_labs/page/window_page.dart';
 import 'package:mobile_labs/widgets/app_drawer.dart';
+
 
 abstract class BaseHomePage extends StatefulWidget {
   const BaseHomePage({super.key});
@@ -153,7 +157,12 @@ abstract class BaseHomePageState<T extends BaseHomePage> extends State<T> {
         _controlButton(
           Icons.notifications,
           'Signal',
-          () => openPage(SignalPage(eventLog: eventLog)),
+              () => openPage(
+            BlocProvider(
+              create: (_) => SignalCubit()..loadInitialEvents(eventLog),
+              child: const SignalPage(),
+            ),
+          ),
         ),
       ],
     );
